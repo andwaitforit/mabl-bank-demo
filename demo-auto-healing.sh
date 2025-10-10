@@ -10,7 +10,7 @@ echo -e "${BLUE}Demo: mabl Auto-healing vs Traditional Selectors${NC}"
 echo "This script demonstrates mabl's auto-healing capabilities compared to traditional Playwright selectors."
 echo "Authenticating to the mabl cli"
 
-mabl auth activate-key PN9OXnjpkpnjYXIgnLyIcw
+mabl auth activate-key <your-mabl-cli-auth-key>
 
 # Save original state
 echo -e "${BLUE}1. Saving original state...${NC}"
