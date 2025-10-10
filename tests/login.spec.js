@@ -56,8 +56,8 @@ test.describe('Login smoke', () => {
     await page.screenshot({ path: 'test-results/02-credentials-filled.png' });
     
     console.log('Clicking login button...');
-    const loginButton = await page.locator('button[type="submit"]');
-    await highlightElement(page, 'button[type="submit"]');
+    const loginButton = await page.locator('button.btn:has-text("Login")');
+    await highlightElement(page, 'button.btn');
     await loginButton.click();
 
     console.log('Waiting for dashboard...');
