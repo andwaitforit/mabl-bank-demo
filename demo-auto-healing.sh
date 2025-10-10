@@ -120,9 +120,9 @@ read -p "Press [Enter] to continue to the next step..."
 
 # Reset to original state
 echo -e "${BLUE}6. Resetting to original state...${NC}"
-# Clean up test artifacts first
+# Clean up test artifacts and force restore original state
 rm -rf test-results/
-# Now restore original state
+git checkout src/components/LoginPage.js
 git stash pop
 echo -e "${GREEN}Demo complete! Original state restored.${NC}"
 
