@@ -9,7 +9,6 @@ He also does the withdrawal and deposit manually for each account.
 He also does the transfer of balances if there are requests for it.
 Your task is to help this poor employee out by creating a simple admin banking app
 
-[Live demo of Banking App](https://jeffdelara.github.io/banking-app/)
 
 ## Objective
 A banking app created with ReactJS that we can test with both mabl and playwright. Included is a shell script
