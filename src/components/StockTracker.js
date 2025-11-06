@@ -5,7 +5,7 @@ export const StockTracker = () => {
   const [trackedStocks, setTrackedStocks] = useState([]);
   const [stockData, setStockData] = useState({});
   const [loading, setLoading] = useState(false);
-  const API_URL = 'http://localhost:3001/api';
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
   // Load tracked stocks from localStorage on mount
   useEffect(() => {
