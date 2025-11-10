@@ -1,0 +1,57 @@
+# Multi-stage build for combined frontend + backend
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build argument for API URL (now it's same server, so use relative path)
+ARG REACT_APP_API_URL=/api
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
+# Override homepage for Docker deployment
+RUN node -e "const pkg = require('./package.json'); delete pkg.homepage; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));"
+
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
+# Build the React app
+RUN npm run build
+
+# Production stage - minimal Node.js runtime
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Copy server file
+COPY server.js ./
+
+# Copy built React app from builder stage
+COPY --from=builder /app/build ./build
+
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=3001
+
+# Expose single port
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/api/stocks', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start the server
+CMD ["node", "server.js"]
+

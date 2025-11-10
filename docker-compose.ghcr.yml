@@ -1,27 +1,19 @@
 version: '3.8'
 
 services:
-  frontend:
-    image: ghcr.io/andwaitforit/mabl-bank-demo-frontend:latest
-    container_name: banking-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - api
-    networks:
-      - banking-network
-    restart: unless-stopped
-
-  api:
-    image: ghcr.io/andwaitforit/mabl-bank-demo-api:latest
-    container_name: banking-api
+  app:
+    image: ghcr.io/andwaitforit/mabl-bank-demo:latest
+    container_name: banking-app
     ports:
       - "3001:3001"
-    networks:
-      - banking-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
     restart: unless-stopped
-
-networks:
-  banking-network:
-    driver: bridge
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/stocks', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 

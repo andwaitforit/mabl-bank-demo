@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -82,7 +83,22 @@ app.get('/api/stocks/batch/:symbols', (req, res) => {
   res.json(stocks);
 });
 
+// Serve static files from React build (only in production/Docker)
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'build')));
+  
+  // Handle React Router - send all non-API requests to index.html
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  });
+}
+
 app.listen(PORT, () => {
-  console.log(`Stock API server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Serving React app and API from single server');
+  } else {
+    console.log('API only mode - use separate React dev server');
+  }
 });
 
