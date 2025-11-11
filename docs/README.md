@@ -15,6 +15,7 @@ This directory contains all documentation for the Banking App demo project.
 ### Technical Documentation
 - **[API Documentation](API_DOCUMENTATION.md)** - Backend API endpoints
 - **[Docker Testing](DOCKER_TESTING.md)** - Docker deployment guide
+- **[mabl Integration](MABL_INTEGRATION.md)** - Automated testing in CI/CD pipeline
 - **[Alternative AI MCP Approach](ALTERNATIVE_AI_MCP_APPROACH.md)** - Alternative implementation
 - **[Codex MCP Jenkins](CODEX_MCP_JENKINS.md)** - Jenkins integration
 
@@ -44,6 +45,7 @@ This directory contains all documentation for the Banking App demo project.
 | [API Documentation](API_DOCUMENTATION.md) | Backend API reference | Developers |
 | [Docker Testing](DOCKER_TESTING.md) | Docker setup and testing | DevOps |
 | [GitHub Container Registry](GITHUB_CONTAINER_REGISTRY.md) | GHCR setup and usage | DevOps |
+| [mabl Integration](MABL_INTEGRATION.md) | Automated testing in CI/CD | DevOps, QA |
 | [Codex MCP Jenkins](CODEX_MCP_JENKINS.md) | CI/CD integration | DevOps |
 
 ### 🐛 For Debugging
