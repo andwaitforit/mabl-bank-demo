@@ -108,5 +108,25 @@ jobs:
           ssh -o StrictHostKeyChecking=accept-new deploy@truenas-scale \
             "sudo '/mnt/NVME Pool/mabldemo/andy/restart-bank-demo.sh'"
 
-      - name: Post-deploy hook (placeholder)
-        run: echo "Add health checks or notifications here."
+      - name: Run mabl smoke tests
+        id: mabl-test-smoke
+        uses: mablhq/github-run-tests-action@v1
+        env:
+          MABL_API_KEY: ${{ secrets.MABL_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          application-id: DKjPLqbtZzGN9wuWe2Lylg-a
+          environment-id: eYHXwE5MYUVwMrsM1D8w0g-e
+          plan-labels: smoke
+          continue-on-failure: true
+
+      - name: Output mabl smoke test results
+        if: always()
+        run: |
+          echo "mabl Deployment ID: ${{ steps.mabl-test-smoke.outputs.mabl-deployment-id }}"
+          echo "Plans Run: ${{ steps.mabl-test-smoke.outputs.plans_run }}"
+          echo "Plans Passed: ${{ steps.mabl-test-smoke.outputs.plans_passed }}"
+          echo "Plans Failed: ${{ steps.mabl-test-smoke.outputs.plans_failed }}"
+          echo "Tests Run: ${{ steps.mabl-test-smoke.outputs.tests_run }}"
+          echo "Tests Passed: ${{ steps.mabl-test-smoke.outputs.tests_passed }}"
+          echo "Tests Failed: ${{ steps.mabl-test-smoke.outputs.tests_failed }}"
