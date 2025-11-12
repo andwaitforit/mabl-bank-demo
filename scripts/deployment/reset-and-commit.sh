@@ -55,6 +55,39 @@ if [ ! -f ".original-transact-page.backup" ] && [ -f "src/components/TransactPag
         git push
         echo -e "${GREEN}✓ Changes pushed to remote${NC}"
         echo ""
+        
+        # Step 5: Ask about creating deployment tag
+        echo -e "${YELLOW}Would you like to create a release tag to trigger deployment? (y/n)${NC}"
+        read -r tag_response
+        if [[ "$tag_response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            # Get next version number
+            current_tags=$(git tag -l "v*-prod" | grep -o 'v[0-9]*\.[0-9]*' | sort -V | tail -1)
+            if [ -z "$current_tags" ]; then
+                next_version="v1.0"
+            else
+                version_number=$(echo "$current_tags" | sed 's/v//')
+                major=$(echo "$version_number" | cut -d'.' -f1)
+                minor=$(echo "$version_number" | cut -d'.' -f2)
+                minor=$((minor + 1))
+                next_version="v${major}.${minor}"
+            fi
+            
+            echo ""
+            echo -e "${YELLOW}Suggested next version: ${next_version}-prod${NC}"
+            echo -e "${YELLOW}Enter version tag (or press Enter to use suggested):${NC}"
+            read -r version_tag
+            
+            if [ -z "$version_tag" ]; then
+                version_tag="${next_version}-prod"
+            fi
+            
+            echo ""
+            echo -e "${BLUE}Step 6: Creating and pushing tag ${version_tag}...${NC}"
+            git tag "$version_tag" -m "Release $version_tag: Reset demo environment"
+            git push origin "$version_tag"
+            echo -e "${GREEN}✓ Tag created and pushed${NC}"
+            echo ""
+        fi
     else
         echo ""
         echo -e "${YELLOW}Skipping push. Run 'git push' manually when ready.${NC}"
