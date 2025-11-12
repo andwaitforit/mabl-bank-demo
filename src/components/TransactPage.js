@@ -9,9 +9,12 @@ export const TransactPage = (props) => {
     const [accounts, setAccounts] = useState(users);
     const [selectedAccount, setSelectedAccount] = useState({balance: 0});
     const [depositAmount, setDepositAmount] = useState(0);
+    const [donationEnabled, setDonationEnabled] = useState(false);
+    
+    const DONATION_AMOUNT = 5; // Fixed $5 donation to Sweetums Charity
 
-    const options = accounts.map(user => {
-        return <option value={user.number}>{user.fullname} #{user.number}</option>
+    const options = accounts.map((user, index) => {
+        return <option key={index} value={user.number}>{user.fullname} #{user.number}</option>
     });
 
     const displayBalance = (e) => {
@@ -32,19 +35,36 @@ export const TransactPage = (props) => {
         setDepositAmount(amount);
     }
 
+    const onDonationToggle = () => {
+        setDonationEnabled(prev => !prev);
+    }
+
     const processTransfer = (e) => {
         e.preventDefault();
         const amount = trim(e.target.elements.amount.value);
         const accountNumber = e.target.elements.account.value;
+        
+        // FIX: Include the fixed $5 donation if enabled
+        const donation = donationEnabled ? DONATION_AMOUNT : 0;
 
         if(amount > 0 && accountNumber !== "0") {
             for(const user of accounts) {
                 if(user.number === accountNumber) {
-                    transact(user.number, amount, props.type, props.setUsers);
+                    // FIX: Calculate total amount including donation
+                    const totalAmount = parseFloat(amount) + donation;
+                    
+                    // Process the total withdrawal (including donation)
+                    transact(user.number, totalAmount, props.type, props.setUsers);
                     setSelectedAccount(findAccount(user.number));
                     setAccounts(JSON.parse(localStorage.getItem('users')));
                     setDepositAmount(0);
-                    setNotif({message: `${capitalize(props.page)} successful.`, style: 'success'});
+                    setDonationEnabled(false);
+                    
+                    let message = `${capitalize(props.page)} successful.`;
+                    if (donationEnabled) {
+                        message += ` Thank you for your $${DONATION_AMOUNT} donation to Sweetums Charity!`;
+                    }
+                    setNotif({message: message, style: 'success'});
                     break;
                 }
             }
@@ -53,8 +73,9 @@ export const TransactPage = (props) => {
             setNotif({message: `${capitalize(props.page)} failed.`, style: 'danger'});
         }
     }
-    // 'bx bx-up-arrow-alt'
+
     const icon = props.page === 'withdraw' ? 'bx bx-down-arrow-alt' : 'bx bx-up-arrow-alt';
+    const showDonation = props.page === 'withdraw';
 
     return (
         <section id="main-content">
@@ -73,6 +94,25 @@ export const TransactPage = (props) => {
                 <div className="transfer-icon"><i className={icon}></i></div>
                 <label>Amount to {props.page}</label>
                 <input type="text" name="amount" value={depositAmount || ''} onChange={onDeposit} autoComplete="off" className="right big-input" placeholder="0.00" />
+                
+                {showDonation && (
+                    <div style={{marginTop: '20px', padding: '15px', backgroundColor: '#f0f8ff', borderRadius: '5px', border: '1px solid #4CAF50'}}>
+                        <div style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}} onClick={onDonationToggle}>
+                            <input 
+                                type="checkbox" 
+                                id="donation-toggle"
+                                checked={donationEnabled}
+                                onChange={onDonationToggle}
+                                readOnly
+                                style={{marginRight: '10px', cursor: 'pointer', width: '18px', height: '18px', pointerEvents: 'none'}}
+                            />
+                            <span style={{fontSize: '16px', fontWeight: '500', userSelect: 'none'}}>
+                                Donate $5 to Sweetums Charity 🍬
+                            </span>
+                        </div>
+                    </div>
+                )}
+                
                 <button type="submit" className="btn">{props.page}</button>
             </form>
         </section>
